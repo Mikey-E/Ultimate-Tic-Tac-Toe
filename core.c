@@ -1,0 +1,294 @@
+//Author: Michael Elgin
+//Game core for ultimate tic tac toe
+//Contains functions to run the game, compute winner, ask agents for moves, etc
+
+#include "core.h"
+
+//A sector is 1-9 inclusive (left->right, top->down)
+
+//Declare move functions for all agents
+void playHumanMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol);
+void playRandomMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol);
+
+//Prints the board out in a "pretty" way
+//-1 for maxRow and maxCol ensure a normal board
+void printBoard(char** board, int maxRow, int maxCol){
+	int i; int j;
+	printf("\n   1--2--3---4--5--6---7--8--9");
+	char normalLine[100] = "\n -------------------------------\n";
+	char midLine[100];
+	if ((maxRow == -1) && (maxCol == -1)){
+		sprintf(midLine, "\n -^^^^^^^^^^^^^^^^^^^^^^^^^^^^^-\n");
+	}else{
+		sprintf(midLine, "\n -------------------------------\n");
+	}
+	char midLineWithHats[100];
+	if (maxCol == 3){
+		sprintf(midLineWithHats, "\n -^^^^^^^^^---------------------\n");
+	}else if(maxCol == 6){
+		sprintf(midLineWithHats, "\n -----------^^^^^^^^^-----------\n");
+	}else if(maxCol == 9){
+		sprintf(midLineWithHats, "\n ---------------------^^^^^^^^^-\n");
+	}
+	for (i = 0; i < 9; i++){
+		if ((i % 3) == 0){
+			if (i == 0){
+				printf(normalLine);
+			}else{
+				printf(i == maxRow ? midLineWithHats : midLine);
+			}
+		} else {
+			printf("\n");
+		}
+		printf("%d", i+1);
+		for (j = 0; j < 9; j++){
+			if ((j % 3) == 0){printf("|");}
+			printf(" %c ", board[i][j]);
+			if ((j + 1) == 9){printf("|");}
+		}
+	}
+	printf(maxRow == 9 ? midLineWithHats : midLine);
+}
+
+void setBoard(char** board, char c, int row, int col){
+	board[row-1][col-1] = c;
+}
+
+char queryBoard(char** board, int row, int col){
+	return board[row-1][col-1];
+}
+
+//Sets rowIndex and colIndex pointers to starting positions of the sector
+//Needed before calling some other functions
+void convertSectorToIndexes(int sector, int* rowIndex, int* colIndex){
+	if (sector == 1){*rowIndex = 0; *colIndex = 0;}
+	else if (sector == 2){*rowIndex = 0; *colIndex = 3;}
+	else if (sector == 3){*rowIndex = 0; *colIndex = 6;}
+	else if (sector == 4){*rowIndex = 3; *colIndex = 0;}
+	else if (sector == 5){*rowIndex = 3; *colIndex = 3;}
+	else if (sector == 6){*rowIndex = 3; *colIndex = 6;}
+	else if (sector == 7){*rowIndex = 6; *colIndex = 0;}
+	else if (sector == 8){*rowIndex = 6; *colIndex = 3;}
+	else if (sector == 9){*rowIndex = 6; *colIndex = 6;}
+}
+
+//Examines a sector and determines if there is any winner
+//Returns null terminator \0 for no winner or already won, or char of winner that needs to be updated
+char examineSectorForWinner(char** board, int sector){
+	//assign indexes based on sector
+	int i;
+	int rowIndex, colIndex;
+	convertSectorToIndexes(sector, &rowIndex, &colIndex);
+	//check if already won
+	if (	(board[rowIndex][colIndex] == board[rowIndex][colIndex + 1])		&&
+			(board[rowIndex][colIndex] == board[rowIndex][colIndex + 2])		&&
+			(board[rowIndex][colIndex] == board[rowIndex + 1][colIndex])		&&
+			(board[rowIndex][colIndex] == board[rowIndex + 1][colIndex + 1])	&&
+			(board[rowIndex][colIndex] == board[rowIndex + 1][colIndex + 2])	&&
+			(board[rowIndex][colIndex] == board[rowIndex + 2][colIndex])		&&
+			(board[rowIndex][colIndex] == board[rowIndex + 2][colIndex + 1])	&&
+			(board[rowIndex][colIndex] == board[rowIndex + 2][colIndex + 2])	){
+		return '\0';
+	}
+	//check diagonal
+	if (	(board[rowIndex][colIndex] == board[rowIndex + 1][colIndex + 1])	&&
+			(board[rowIndex][colIndex] == board[rowIndex + 2][colIndex + 2])){
+		return board[rowIndex][colIndex];
+	}
+	if (	(board[rowIndex + 2][colIndex] == board[rowIndex + 1][colIndex + 1])	&&
+			(board[rowIndex + 2][colIndex] == board[rowIndex][colIndex + 2])){
+		return board[rowIndex + 2][colIndex];
+	}
+	//check horizontal
+	for (i = 0; i < 3; i++){
+		if (	(board[rowIndex + i][colIndex] != '\0') &&
+				(board[rowIndex + i][colIndex] == board[rowIndex + i][colIndex + 1])	&&
+				(board[rowIndex + i][colIndex] == board[rowIndex + i][colIndex + 2])){
+			return board[rowIndex + i][colIndex];
+		}
+	}
+	//check vertical
+	for (i = 0; i < 3; i++){
+		if (	(board[rowIndex][colIndex + i] != '\0') &&
+				(board[rowIndex][colIndex + i] == board[rowIndex + 1][colIndex + i])	&&
+				(board[rowIndex][colIndex + i] == board[rowIndex + 2][colIndex + i])){
+			return board[rowIndex][colIndex + i];
+		}
+	}	
+	return '\0';//if none of the above returned, no winner
+}
+
+//Examines all 9 sectors, if the sector is won,
+//all spots in that sector will be given to the winner
+//Returns sector where that happened, or 0 if it did not happen
+int updateBoardStatus(char** board){
+	char sectorWinner;
+	int rowIndex, colIndex;
+	int i, j, k;
+	for (i = 1; i <= 9; i++){
+		sectorWinner = examineSectorForWinner(board, i);
+		if (sectorWinner != '\0'){
+			convertSectorToIndexes(i, &rowIndex, &colIndex);
+			for (j = 0; j < 3; j++){
+				for (k = 0; k < 3; k++){
+					board[rowIndex + j][colIndex + k] = sectorWinner;
+				}
+			}
+			return i;
+		}
+	}
+	return 0;
+}
+
+int sumEmptySpaces(char** board){
+	int sum = 0;
+	int i, j;
+	for (i = 0; i < 9; i++){
+		for (j = 0; j < 9; j++){
+			if (board[i][j] == '\0'){sum++;}
+		}
+	}
+	return sum;
+}
+
+//sets the move function for an agent
+void setMoveFunction(void (**fPtrPtr)(char**, int*, int, int, int, int)){
+	char agentType;
+	do{
+		agentType = fgetc(stdin);
+		agentType = agentType - 48;
+		fflush(stdin);
+	}while ((agentType < 1) || (agentType > 2));
+	if (agentType == 1){
+		*fPtrPtr = &playHumanMove;
+	}else if (agentType == 2){
+		*fPtrPtr = &playRandomMove;
+	}
+}
+
+//Runs the program, calls upon agents to give moves to the board
+int main(int argc, char** argv){
+	int i; int j;
+	char** board;
+	board = malloc(9 * sizeof(char*));
+	for (i = 0; i < 9; i++){
+		board[i] = (char*) calloc(9, sizeof(char));
+	}
+	char** smallSectorBoard;//for keeping track of won sectors, and therefore computing winner
+	smallSectorBoard = malloc(3 * sizeof(char*));
+	for (i = 0; i < 3; i++){
+		smallSectorBoard[i] = (char*) calloc(3, sizeof(char));
+	}
+	int rowIndex, colIndex;//for helper functions that need them
+	int rowMove, colMove;
+	int rowMod, colMod;//for calculation of next allowed spaces
+	int minRow = 1; int maxRow = 9;
+	int minCol = 1; int maxCol = 9;
+	int turn = 1;//turn of player 1 or player 2
+	int isFullSector;
+	int changedSector;
+	char currChar;
+	char potentialWinner;//for checking if overall game has been won each round
+	void (*agentFunction1)(char**, int*, int, int, int, int);//called for moves
+	void (*agentFunction2)(char**, int*, int, int, int, int);//"
+
+	printf("\nUltimate Tic-Tac-Toe\n");//initial message
+
+	//Select what agent to play against
+	printf("1 = Human\n");
+	printf("2 = Random move maker (very easy)\n");
+	printf("What type of player is player 1: ");
+	setMoveFunction(&agentFunction1);
+	printf("What type of player is player 2: ");
+	setMoveFunction(&agentFunction2);
+
+	printBoard(board, -1, -1);//initial empty board
+
+	int* moves = calloc(2, sizeof(int));//what each agent sets as its decided move
+	while(1){//game begins
+		turn == 1 ? (*agentFunction1)(board, moves, minRow, maxRow, minCol, maxCol)://for true
+					(*agentFunction2)(board, moves, minRow, maxRow, minCol, maxCol);//for false
+		rowMove = moves[0];
+		colMove = moves[1];
+		//check validity of move
+		if (	(rowMove < minRow) ||
+				(rowMove > maxRow) ||
+				(colMove < minCol) ||
+				(colMove > maxCol)
+				){
+			printf("For this move the row must be between %d and %d inclusive,\n", minRow, maxRow);
+			printf("and the col must be between %d and %d inclusive.\n", minCol, maxCol);
+		}else if (queryBoard(board, rowMove, colMove) != '\0'){
+			printf("That spot is already taken\n");
+		}else{//acceptable move
+			currChar = (turn == 1 ? 'X' : 'O');
+			setBoard(board, currChar, rowMove, colMove);
+			changedSector = updateBoardStatus(board);
+			if (changedSector){//update the small board
+				convertSectorToIndexes(changedSector, &rowIndex, &colIndex);
+				//compensate for smaller board
+				rowIndex = rowIndex / 3;
+				colIndex = colIndex / 3;
+				setBoard(smallSectorBoard, currChar, rowIndex + 1, colIndex + 1);
+				potentialWinner = examineSectorForWinner(smallSectorBoard, 1);
+				if (potentialWinner != '\0'){//we have a winner
+					printBoard(board, -1, -1);
+					printf("%c Wins!\n", potentialWinner);
+					goto cleanUpMemory;
+				}
+			}
+			if (sumEmptySpaces(board) == 0){//draw
+				printBoard(board, -1, -1);
+				printf("Tie!\n");
+				goto cleanUpMemory;
+			}
+			rowMod = (rowMove-1) % 3;
+			colMod = (colMove-1) % 3;
+			minRow = 1 + (rowMod * 3);
+			maxRow = 3 + (rowMod * 3);
+			minCol = 1 + (colMod * 3);
+			maxCol = 3 + (colMod * 3);
+			//check that there is an empty space to be played within the min/max bounds
+			isFullSector = 1;//assume full until a space is found
+			for (i = minRow; i <= maxRow; i++){
+				for (j = minCol; j <= maxCol; j++){
+					if (queryBoard(board, i, j) == '\0'){
+						isFullSector = 0;
+						break;
+					}
+				}
+			}
+			if (isFullSector){//play anywhere
+				minRow = 1;
+				maxRow = 9;
+				minCol = 1;
+				maxCol = 9;
+				printBoard(board, -1, -1);
+			}else{
+				printBoard(board, maxRow, maxCol);
+			}
+#ifdef DEBUG
+			//see status of small sector board for won sectors
+			printf("[%d][%d][%d]\n", smallSectorBoard[0][0], smallSectorBoard[0][1], smallSectorBoard[0][2]);
+			printf("[%d][%d][%d]\n", smallSectorBoard[1][0], smallSectorBoard[1][1], smallSectorBoard[1][2]);
+			printf("[%d][%d][%d]\n", smallSectorBoard[2][0], smallSectorBoard[2][1], smallSectorBoard[2][2]);
+#endif
+			if (turn == 1) {turn = 2;} else {turn = 1;}
+		}
+#ifdef SLEEP
+		sleep(1);
+#endif
+	}
+cleanUpMemory:
+	//clean-up memory
+	for (i = 0; i < 9; i++){
+		free(board[i]);
+	}
+	free(board);
+	for (i = 0; i < 3; i++){
+		free(smallSectorBoard[i]);
+	}
+	free(smallSectorBoard);
+	free(moves);
+	return 0;//should never hit this line, but main should always return something from all paths.
+}
