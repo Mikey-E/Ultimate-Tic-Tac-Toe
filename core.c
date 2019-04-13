@@ -169,6 +169,33 @@ void setMoveFunction(void (**fPtrPtr)(char**, int*, int, int, int, int, char)){
 	}
 }
 
+//takes a board and most recent move and updates the values for boundaries
+void updateBounds(int rowMove, int colMove, char** board, int* minRow, int* maxRow, int* minCol, int* maxCol, int* isFullSector){
+	int rowMod = (rowMove-1) % 3;
+	int colMod = (colMove-1) % 3;
+	*minRow = 1 + (rowMod * 3);
+	*maxRow = 3 + (rowMod * 3);
+	*minCol = 1 + (colMod * 3);
+	*maxCol = 3 + (colMod * 3);
+	//check that there is an empty space to be played within the min/max bounds
+	*isFullSector = 1;//assume full until a space is found
+	int i; int j;
+	for (i = *minRow; i <= *maxRow; i++){
+		for (j = *minCol; j <= *maxCol; j++){
+			if (queryBoard(board, i, j) == '\0'){
+				*isFullSector = 0;
+				break;
+			}
+		}
+	}
+	if (*isFullSector){//play anywhere
+		*minRow = 1;
+		*maxRow = 9;
+		*minCol = 1;
+		*maxCol = 9;
+	}
+}
+
 //Runs the program, calls upon agents to give moves to the board
 int main(int argc, char** argv){
 	if (argc != 1){
@@ -187,7 +214,7 @@ int main(int argc, char** argv){
 				exit(0);
 		}
 	}
-	int i; int j;
+	int i;
 	char** board;
 	board = malloc(9 * sizeof(char*));
 	for (i = 0; i < 9; i++){
@@ -200,7 +227,6 @@ int main(int argc, char** argv){
 	}
 	int rowIndex, colIndex;//for helper functions that need them
 	int rowMove, colMove;
-	int rowMod, colMod;//for calculation of next allowed spaces
 	int minRow = 1; int maxRow = 9;
 	int minCol = 1; int maxCol = 9;
 	int turn = 1;//turn of player 1 or player 2
@@ -262,27 +288,8 @@ int main(int argc, char** argv){
 				printf("Tie!\n");
 				goto cleanUpMemory;
 			}
-			rowMod = (rowMove-1) % 3;
-			colMod = (colMove-1) % 3;
-			minRow = 1 + (rowMod * 3);
-			maxRow = 3 + (rowMod * 3);
-			minCol = 1 + (colMod * 3);
-			maxCol = 3 + (colMod * 3);
-			//check that there is an empty space to be played within the min/max bounds
-			isFullSector = 1;//assume full until a space is found
-			for (i = minRow; i <= maxRow; i++){
-				for (j = minCol; j <= maxCol; j++){
-					if (queryBoard(board, i, j) == '\0'){
-						isFullSector = 0;
-						break;
-					}
-				}
-			}
+			updateBounds(rowMove, colMove, board, &minRow, &maxRow, &minCol, &maxCol, &isFullSector);
 			if (isFullSector){//play anywhere
-				minRow = 1;
-				maxRow = 9;
-				minCol = 1;
-				maxCol = 9;
 				printBoard(board, -1, -1);
 			}else{
 				printBoard(board, maxRow, maxCol);
