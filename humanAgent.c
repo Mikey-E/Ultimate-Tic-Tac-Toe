@@ -2,7 +2,7 @@
 
 void playHumanMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol){
 #ifdef SLEEP
-	sleep(1);
+	sleep(SLEEP);
 #endif
 	char row;
 	char col;

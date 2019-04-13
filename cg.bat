@@ -1,2 +1,1 @@
-gcc core.c humanAgent.c randomAgent.c -o uttt -ggdb
-uttt.exe
+gcc core.c humanAgent.c randomAgent.c MCTSAgent.c -o uttt -ggdb

@@ -9,6 +9,7 @@
 //Declare move functions for all agents
 void playHumanMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol);
 void playRandomMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol);
+void playMCTSMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol);
 
 //Prints the board out in a "pretty" way
 //-1 for maxRow and maxCol ensure a normal board
@@ -158,16 +159,34 @@ void setMoveFunction(void (**fPtrPtr)(char**, int*, int, int, int, int)){
 		agentType = fgetc(stdin);
 		agentType = agentType - 48;
 		fflush(stdin);
-	}while ((agentType < 1) || (agentType > 2));
+	}while ((agentType < 1) || (agentType > 3));//update if more agents are added in the future
 	if (agentType == 1){
 		*fPtrPtr = &playHumanMove;
 	}else if (agentType == 2){
 		*fPtrPtr = &playRandomMove;
+	}else if (agentType == 3){
+		*fPtrPtr = &playMCTSMove;
 	}
 }
 
 //Runs the program, calls upon agents to give moves to the board
 int main(int argc, char** argv){
+	if (argc != 1){
+		printf("Usage: uttt [-h]\n-h:\tHelp. (Display rules.)\n\n");
+		exit(0);
+	}
+	int option;
+	while ((option = getopt(argc, argv, "h")) != -1){
+		switch(option){
+			case 'h':
+				printf("Rules:\n");
+				printf("Conquer 3 sectors just like in normal tic-tac-toe to achieve victory.\n");
+				printf("Each sector is its own tic-tac-toe game.\n");
+				printf("Where you play in each sector corresponds to the next sector that your opponent has to play in,\n");
+				printf("if that sector is full or conquered, then your opponent may play anywhere.\n");
+				exit(0);
+		}
+	}
 	int i; int j;
 	char** board;
 	board = malloc(9 * sizeof(char*));
@@ -197,6 +216,7 @@ int main(int argc, char** argv){
 	//Select what agent to play against
 	printf("1 = Human\n");
 	printf("2 = Random move maker (very easy)\n");
+	printf("3 = Monte Carlo Tree Search (challenging)\n");
 	printf("What type of player is player 1: ");
 	setMoveFunction(&agentFunction1);
 	printf("What type of player is player 2: ");
@@ -221,7 +241,7 @@ int main(int argc, char** argv){
 		}else if (queryBoard(board, rowMove, colMove) != '\0'){
 			printf("That spot is already taken\n");
 		}else{//acceptable move
-			currChar = (turn == 1 ? 'X' : 'O');
+			currChar = (turn == 1 ? PLAYER1CHAR : PLAYER2CHAR);
 			setBoard(board, currChar, rowMove, colMove);
 			changedSector = updateBoardStatus(board);
 			if (changedSector){//update the small board
@@ -276,7 +296,7 @@ int main(int argc, char** argv){
 			if (turn == 1) {turn = 2;} else {turn = 1;}
 		}
 #ifdef SLEEP
-		sleep(1);
+		sleep(SLEEP);
 #endif
 	}
 cleanUpMemory:
@@ -290,5 +310,5 @@ cleanUpMemory:
 	}
 	free(smallSectorBoard);
 	free(moves);
-	return 0;//should never hit this line, but main should always return something from all paths.
+	return 0;//Success.
 }
