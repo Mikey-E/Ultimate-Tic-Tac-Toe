@@ -1,6 +1,6 @@
 #include "core.h"
 
-void playHumanMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol){
+void playHumanMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol, char myChar){
 #ifdef SLEEP
 	sleep(SLEEP);
 #endif
@@ -21,7 +21,7 @@ void playHumanMove(char** board, int* dest, int minRow, int maxRow, int minCol, 
 		(col > 9)
 		){
 		printf("numbers must be in the range of 1-9 inclusive\n");
-		playHumanMove(board, dest, minRow, maxRow, minCol, maxCol);
+		playHumanMove(board, dest, minRow, maxRow, minCol, maxCol, myChar);
 	}else{
 		dest[0] = row;
 		dest[1] = col;

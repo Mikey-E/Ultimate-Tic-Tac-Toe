@@ -7,9 +7,9 @@
 //A sector is 1-9 inclusive (left->right, top->down)
 
 //Declare move functions for all agents
-void playHumanMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol);
-void playRandomMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol);
-void playMCTSMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol);
+void playHumanMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol, char myChar);
+void playRandomMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol, char myChar);
+void playMCTSMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol, char myChar);
 
 //Prints the board out in a "pretty" way
 //-1 for maxRow and maxCol ensure a normal board
@@ -153,7 +153,7 @@ int sumEmptySpaces(char** board){
 }
 
 //sets the move function for an agent
-void setMoveFunction(void (**fPtrPtr)(char**, int*, int, int, int, int)){
+void setMoveFunction(void (**fPtrPtr)(char**, int*, int, int, int, int, char)){
 	char agentType;
 	do{
 		agentType = fgetc(stdin);
@@ -208,8 +208,8 @@ int main(int argc, char** argv){
 	int changedSector;
 	char currChar;
 	char potentialWinner;//for checking if overall game has been won each round
-	void (*agentFunction1)(char**, int*, int, int, int, int);//called for moves
-	void (*agentFunction2)(char**, int*, int, int, int, int);//"
+	void (*agentFunction1)(char**, int*, int, int, int, int, char);//called for moves
+	void (*agentFunction2)(char**, int*, int, int, int, int, char);//"
 
 	printf("\nUltimate Tic-Tac-Toe\n");//initial message
 
@@ -226,8 +226,8 @@ int main(int argc, char** argv){
 
 	int* moves = calloc(2, sizeof(int));//what each agent sets as its decided move
 	while(1){//game begins
-		turn == 1 ? (*agentFunction1)(board, moves, minRow, maxRow, minCol, maxCol)://for true
-					(*agentFunction2)(board, moves, minRow, maxRow, minCol, maxCol);//for false
+		turn == 1 ? (*agentFunction1)(board, moves, minRow, maxRow, minCol, maxCol, PLAYER1CHAR)://for true
+					(*agentFunction2)(board, moves, minRow, maxRow, minCol, maxCol, PLAYER2CHAR);//for false
 		rowMove = moves[0];
 		colMove = moves[1];
 		//check validity of move
