@@ -8,6 +8,47 @@
 
 //A sector is 1-9 inclusive (left->right, top->down)
 
+//initializes a board and returns the pointer to it
+char** initBoard(int size){
+	char** board;
+	board = malloc(size * sizeof(char*));
+	int i;
+	for (i = 0; i < size; i++){
+		board[i] = (char*) calloc(size, sizeof(char));
+	}
+	return board;
+}
+
+//creates a copy of an existing board and returns the pointer to it
+char** copyBoard(char** board, int size){
+	char** newBoard = initBoard(size);
+	int i; int j;
+	for (i = 0; i < size; i++){
+		for (j = 0; j < size; j++){
+			newBoard[i][j] = board[i][j];
+		}
+	}
+	return newBoard;
+}
+
+//frees all dynamically allocated memory associated with a board
+void freeBoard(char** board){
+	int i;
+	for (i = 0; i < 9; i++){
+		free(board[i]);
+	}
+	free(board);
+}
+
+//frees all dynamically allocated memory associated with a smallSectorBoard
+void freeSmallSectorBoard(char** board){
+	int i;
+	for (i = 0; i < 3; i++){
+		free(board[i]);
+	}
+	free(board);
+}
+
 //Prints the board out in a "pretty" way
 //-1 for maxRow and maxCol ensure a normal board
 void printBoard(char** board, int maxRow, int maxCol){
@@ -212,16 +253,8 @@ int main(int argc, char** argv){
 		}
 	}
 	int i;
-	char** board;
-	board = malloc(9 * sizeof(char*));
-	for (i = 0; i < 9; i++){
-		board[i] = (char*) calloc(9, sizeof(char));
-	}
-	char** smallSectorBoard;//for keeping track of won sectors, and therefore computing winner
-	smallSectorBoard = malloc(3 * sizeof(char*));
-	for (i = 0; i < 3; i++){
-		smallSectorBoard[i] = (char*) calloc(3, sizeof(char));
-	}
+	char** board = initBoard(9);
+	char** smallSectorBoard = initBoard(3);//for keeping track of won sectors, and therefore computing winner
 	int rowIndex, colIndex;//for helper functions that need them
 	int rowMove, colMove;
 	int minRow = 1; int maxRow = 9;
@@ -261,6 +294,7 @@ int main(int argc, char** argv){
 				){
 			printf("For this move the row must be between %d and %d inclusive,\n", minRow, maxRow);
 			printf("and the col must be between %d and %d inclusive.\n", minCol, maxCol);
+			sleep(5);//debug@@@
 		}else if (queryBoard(board, rowMove, colMove) != '\0'){
 			printf("That spot is already taken\n");
 		}else{//acceptable move
@@ -305,14 +339,14 @@ int main(int argc, char** argv){
 	}
 cleanUpMemory:
 	//clean-up memory
-	for (i = 0; i < 9; i++){
-		free(board[i]);
+	freeBoard(board);
+	freeSmallSectorBoard(smallSectorBoard);
+	if (treeHashTable[PLAYER1CHAR]){
+		freeTree(treeHashTable[PLAYER1CHAR]);
 	}
-	free(board);
-	for (i = 0; i < 3; i++){
-		free(smallSectorBoard[i]);
+	if (treeHashTable[PLAYER2CHAR]){
+		freeTree(treeHashTable[PLAYER2CHAR]);
 	}
-	free(smallSectorBoard);
 	free(moves);
 	return 0;//Success.
 }
