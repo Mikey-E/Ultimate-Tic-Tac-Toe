@@ -1,17 +1,36 @@
 #include "core.h"
+#include "MCTS.h"
 
-#define SEARCH_DEPTH 1
+//void createChildren()
 
-typedef struct Node node;
-
-struct Node {
-	int isRoot;//0 or 1, false or true
-	node* parent;//only ever 1 parent in the tree
-	node** children;
-	int sims;//total simulations down this node
-	float wins;//total wins down this node. type float because a draw can be credited as a partial win
-};
+int compareBoard(char** board1, char** board2){
+	return 0;//@@@fix
+}
 
 void playMCTSMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol, char myChar){
+	int i;
+	node* root;
+	if (treeHashTable[myChar] == 0){//create root based on current state of the board
+		root = calloc(1, sizeof(node));
+		root->board = board;
+		root->isRoot = 1;
+		root->isMyTurn = 1;
+		root->parent = NULL;
+		root->children = NULL;
+		root->childCount = 0;
+		root->sims = 0;
+		root->wins = 0;
+	}else{//set root node to where it was before
+		root = treeHashTable[myChar];
+		//see which move opponent made and update root to that.
+		for (i = 0; i < root->childCount; i++){
+			if (compareBoard(board, root->children[i]->board)){
+				root = root->children[i]->parent;
+				break;
+			}
+		}
+	}
 	
+	//free memory
+	free(root);
 }

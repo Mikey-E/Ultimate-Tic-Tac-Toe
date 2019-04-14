@@ -3,13 +3,10 @@
 //Contains functions to run the game, compute winner, ask agents for moves, etc
 
 #include "core.h"
+#include "moves.h"
+#include "MCTS.h"
 
 //A sector is 1-9 inclusive (left->right, top->down)
-
-//Declare move functions for all agents
-void playHumanMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol, char myChar);
-void playRandomMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol, char myChar);
-void playMCTSMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol, char myChar);
 
 //Prints the board out in a "pretty" way
 //-1 for maxRow and maxCol ensure a normal board
