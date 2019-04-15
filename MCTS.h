@@ -12,9 +12,11 @@ void playMCTSMove(char** board, int* dest, int minRow, int maxRow, int minCol, i
 int compareBoard(char** board1, char** board2, int* diffRowIndex, int* diffColIndex);
 void freeTree(node* root);
 void freeNode(node* node);
+char playRandomSimulation(node* root);
 
 struct Node {
 	char** board;//board state associated with this node
+	char** smallSectorBoard;
 	
 	//likely not needed
 	//int isRoot;//0 or 1, false or true

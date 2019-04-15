@@ -234,6 +234,18 @@ void updateBounds(int rowMove, int colMove, char** board, int* minRow, int* maxR
 	}
 }
 
+void updateSmallSectorBoard(char** smallSectorBoard, int sector, char updateChar){
+	int* rowIndex = malloc(sizeof(int));
+	int* colIndex = malloc(sizeof(int));
+	convertSectorToIndexes(sector, rowIndex, colIndex);
+	//compensate for smaller board
+	*rowIndex = *rowIndex / 3;
+	*colIndex = *colIndex / 3;
+	setBoard(smallSectorBoard, updateChar, *rowIndex + 1, *colIndex + 1);
+	free(rowIndex);
+	free(colIndex);
+}
+
 //Runs the program, calls upon agents to give moves to the board
 int main(int argc, char** argv){
 	if (argc != 1){
@@ -302,11 +314,7 @@ int main(int argc, char** argv){
 			setBoard(board, currChar, rowMove, colMove);
 			changedSector = updateBoardStatus(board);
 			if (changedSector){//update the small board
-				convertSectorToIndexes(changedSector, &rowIndex, &colIndex);
-				//compensate for smaller board
-				rowIndex = rowIndex / 3;
-				colIndex = colIndex / 3;
-				setBoard(smallSectorBoard, currChar, rowIndex + 1, colIndex + 1);
+				updateSmallSectorBoard(smallSectorBoard, changedSector, currChar);
 				potentialWinner = examineSectorForWinner(smallSectorBoard, 1);
 				if (potentialWinner != '\0'){//we have a winner
 					printBoard(board, -1, -1);
