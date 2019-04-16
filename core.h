@@ -24,6 +24,7 @@ char** copyBoard(char** board, int size);
 #define PLAYER2CHAR 'O'
 #define DEBUG//optional
 #define SLEEP 0//optional (seconds) slows down the pace of the game
+#define SRAND//optional, seeds random number generator based on current time
 //#define SEED_RNG//disable for testing with same RNG sequence
 
 #endif

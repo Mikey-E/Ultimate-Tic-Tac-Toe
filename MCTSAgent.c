@@ -101,11 +101,13 @@ void getSuccessors(node* root){
 void updateTree(node* root, int maxDepth){
 	int i;
 	if (root->childCount > 0){//if it already has children, move down the tree
+		//printf("at root->childCount > 0\n");//debug@@@
 		for (i = 0; i < root->childCount; i++){
 			updateTree(root->children[i], maxDepth - 1);
 		}
 	}else{
 		if (maxDepth <= 0){//if at depth limit, play random simulation & backpropagate data up tree
+			//printf("at maxdepth <= 0\n");//debug@@@
 			char result = playRandomSimulation(root);
 			do{
 				if (result == root->myChar){//win
@@ -118,8 +120,11 @@ void updateTree(node* root, int maxDepth){
 					root->sims++;
 				}
 				root = root->parent;
+				//printf("root: %p\n", root);//debug@@@
 			}while (root != NULL);
+
 		}else{//create new nodes
+			//printf("getting successors\n");//debug@@@
 			getSuccessors(root);
 			for (i = 0; i < root->childCount; i++){
 				updateTree(root->children[i], maxDepth - 1);
@@ -129,6 +134,7 @@ void updateTree(node* root, int maxDepth){
 }
 
 char playRandomSimulation(node* root){
+	//printf("calling new simulation\n");//debug@@@
 	int* moves = calloc(2, sizeof(int));
 	int turn = root->myChar == PLAYER1CHAR ? 1 : 2;
 	char** board = copyBoard(root->board, 9);
@@ -137,31 +143,39 @@ char playRandomSimulation(node* root){
 	int maxRow = root->maxRow;
 	int minCol = root->minCol;
 	int maxCol = root->maxCol;
+	int isFullSector;//only used for updateBounds call
 	int changedSector;
 	char currChar;
-	char potentialWinner;//for checking if overall game has been won each round
+	char potentialWinner = '\0';//for checking if overall game has been won each round
 	while (1){
+/*
+		printf("new turn\n");//debug@@@
+		printf("%d, %d, %d, %d\n", minRow, maxRow, minCol, maxCol);//debug@@@
+*/
+		if (sumEmptySpaces(board) == 0){//draw
+			//potentialWinner = '\0';//represents draw, this statement likely not needed anymore.
+			break;
+		}
 		turn == 1 ? playRandomMove(board, moves, minRow, maxRow, minCol, maxCol, PLAYER1CHAR)://for true
 					playRandomMove(board, moves, minRow, maxRow, minCol, maxCol, PLAYER2CHAR);
 		currChar = (turn == 1 ? PLAYER1CHAR : PLAYER2CHAR);
 		setBoard(board, currChar, moves[0], moves[1]);
+		//printBoard(board, -1, -1);//debug@@@
 		changedSector = updateBoardStatus(board);
 		if (changedSector){
 			updateSmallSectorBoard(smallSectorBoard, changedSector, currChar);
+			potentialWinner = examineSectorForWinner(smallSectorBoard, 1);
+			if (potentialWinner != '\0'){//we have a winner
+				break;
+			}
 		}
-		potentialWinner = examineSectorForWinner(smallSectorBoard, 1);
-		if (potentialWinner != '\0'){//we have a winner
-			break;
-		}
-		if (sumEmptySpaces(board) == 0){//draw
-			potentialWinner = '\0';//represents draw
-			break;
-		}
+		updateBounds(moves[0], moves[1], board, &minRow, &maxRow, &minCol, &maxCol, &isFullSector);
 		if (turn == 1) {turn = 2;} else {turn = 1;}
 	}
 	freeBoard(board);
 	freeSmallSectorBoard(smallSectorBoard);
 	free(moves);
+	//printf("done with simulation\n");//debug@@@
 	return potentialWinner;
 }
 

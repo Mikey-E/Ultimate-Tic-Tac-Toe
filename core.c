@@ -264,6 +264,11 @@ int main(int argc, char** argv){
 				exit(0);
 		}
 	}
+#ifdef SRAND
+	//base random number generator on current time
+	time_t t;
+	srand(time(&t));
+#endif
 	int i;
 	char** board = initBoard(9);
 	char** smallSectorBoard = initBoard(3);//for keeping track of won sectors, and therefore computing winner
