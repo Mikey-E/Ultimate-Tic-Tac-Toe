@@ -4,6 +4,8 @@ On linux you may have to comment out "#include <windows.h>" (insert "//" before 
 Compile with the first line in cg.bat
 Run: ./uttt
 
+Advice: it's a good idea to right-click->properties and change the font and/or size of your windows command prompt so you aren't looking at a very tiny game board.
+
 RULES:
 Conquer 3 sectors just like in normal tic-tac-toe to achieve victory.
 Each sector is its own tic-tac-toe game.
