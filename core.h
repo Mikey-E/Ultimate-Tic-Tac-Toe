@@ -24,7 +24,7 @@ void updateSmallSectorBoard(char** smallSectorBoard, int sector, char updateChar
 #define PLAYER1CHAR 'X'
 #define PLAYER2CHAR 'O'
 //#define DEBUG//optional
-#define SLEEP 0//optional (seconds) slows down the pace of the game
+#define SLEEP 1//optional (seconds) slows down the pace of the game
 #define SRAND//optional, seeds random number generator based on current time. disable for testing with same RNG sequence
 
 #endif

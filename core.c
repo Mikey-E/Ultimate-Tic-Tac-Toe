@@ -288,7 +288,7 @@ int main(int argc, char** argv){
 
 	//Select what agent to play against
 	printf("1 = Human\n");
-	printf("2 = Random move maker (very easy)\n");
+	printf("2 = Random Move Maker (very easy)\n");
 	printf("3 = Monte Carlo Tree Search (challenging)\n");
 	printf("What type of player is player 1: ");
 	setMoveFunction(&agentFunction1);
@@ -311,7 +311,6 @@ int main(int argc, char** argv){
 				){
 			printf("For this move the row must be between %d and %d inclusive,\n", minRow, maxRow);
 			printf("and the col must be between %d and %d inclusive.\n", minCol, maxCol);
-			sleep(5);//debug@@@
 		}else if (queryBoard(board, rowMove, colMove) != '\0'){
 			printf("That spot is already taken\n");
 		}else{//acceptable move

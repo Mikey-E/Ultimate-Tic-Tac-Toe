@@ -2,7 +2,7 @@
 #define MCTS_H
 
 // -- SETTINGS --
-#define MAX_DEPTH 6 //ALWAYS keep as at least 2. Zero wouldn't even make any sense, and also probably cause seg fault
+#define MAX_DEPTH 5 //ALWAYS keep as at least 2. Zero wouldn't even make any sense, and also probably cause seg fault
 					//1 leaves tree with nothing to compare with after opponent's move, also seg fault.
 
 typedef struct Node node;

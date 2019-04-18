@@ -180,6 +180,9 @@ char playRandomSimulation(node* root){
 }
 
 void playMCTSMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol, char myChar){
+	if (MAX_DEPTH >= 5){//it will take a bit of time
+		printf("Thinking...\n");
+	}
 	int i;
 	node* root;
 	node* newRoot;
