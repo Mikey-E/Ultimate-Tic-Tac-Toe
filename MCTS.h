@@ -1,10 +1,6 @@
 #ifndef MCTS_H
 #define MCTS_H
 
-// -- SETTINGS --
-#define MAX_DEPTH 5 //ALWAYS keep as at least 2. Zero wouldn't even make any sense, and also probably cause seg fault
-					//1 leaves tree with nothing to compare with after opponent's move, also seg fault.
-
 typedef struct Node node;
 
 //function headers
@@ -38,5 +34,6 @@ struct Node {
 };
 
 node* treeHashTable[256];//myChar will hash into this to give the root node pointer for that player.
+int depthHashTable[256];//myChar will hash into this and give the search depth for that MCTS agent.
 
 #endif

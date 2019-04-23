@@ -180,7 +180,8 @@ char playRandomSimulation(node* root){
 }
 
 void playMCTSMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol, char myChar){
-	if (MAX_DEPTH >= 5){//it will take a bit of time
+	int searchDepth = depthHashTable[myChar];//get this agent's depth
+	if (searchDepth >= 5){//it will take a bit of time
 		printf("Thinking...\n");
 	}
 	int i;
@@ -244,7 +245,7 @@ void playMCTSMove(char** board, int* dest, int minRow, int maxRow, int minCol, i
 */
 	}
 	//update tree for choosing a good move
-	updateTree(root, MAX_DEPTH);
+	updateTree(root, searchDepth);
 	//select best move based on updated tree
 	int indexOfBest = 0;
 	float bestRatio = 1;

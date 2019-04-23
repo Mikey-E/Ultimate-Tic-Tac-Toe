@@ -191,19 +191,38 @@ int sumEmptySpaces(char** board){
 }
 
 //sets the move function for an agent
-void setMoveFunction(void (**fPtrPtr)(char**, int*, int, int, int, int, char)){
+void setMoveFunction(void (**fPtrPtr)(char**, int*, int, int, int, int, char), char myChar){
 	char agentType;
 	do{
 		agentType = fgetc(stdin);
-		agentType = agentType - 48;
+		agentType = agentType - 48;//compensates for ascii
 		fflush(stdin);
 	}while ((agentType < 1) || (agentType > 3));//update if more agents are added in the future
+		printf("Setting agent type as %d.\n", agentType);
 	if (agentType == 1){
 		*fPtrPtr = &playHumanMove;
 	}else if (agentType == 2){
 		*fPtrPtr = &playRandomMove;
 	}else if (agentType == 3){
 		*fPtrPtr = &playMCTSMove;
+		char searchDepth;
+		printf("What search depth should this MCTS agent have (2 to 9)?\n");
+		printf("2 = easiest (minimum)\n");
+		printf("3 = easy\n");
+		printf("4 = medium\n");
+		printf("5 = challenging\n");
+		printf("6+ = very difficult (and very slow to make moves)\n");
+		printf("Enter search Depth: ");
+		do{
+			searchDepth = fgetc(stdin);
+			searchDepth = searchDepth - 48;//compensates for ascii
+			fflush(stdin);
+		}while ((searchDepth < 2) || (searchDepth > 9));
+		//ALWAYS keep depth as at least 2.
+		//0 wouldn't make any sense, and also probably cause seg fault
+		//1 leaves tree with nothing to compare with after opponent's move, also seg fault.
+		printf("Setting search depth as %d.\n", searchDepth);
+		depthHashTable[myChar] = (int) searchDepth;//each MCTS agent's move function will retrieve this depth
 	}
 }
 
@@ -302,9 +321,9 @@ int main(int argc, char** argv){
 	printf("2 = Random Move Maker (very easy)\n");
 	printf("3 = Monte Carlo Tree Search (challenging)\n");
 	printf("What type of player is player 1: ");
-	setMoveFunction(&agentFunction1);
+	setMoveFunction(&agentFunction1, PLAYER1CHAR);
 	printf("What type of player is player 2: ");
-	setMoveFunction(&agentFunction2);
+	setMoveFunction(&agentFunction2, PLAYER2CHAR);
 
 	printBoard(board, -1, -1);//initial empty board
 
