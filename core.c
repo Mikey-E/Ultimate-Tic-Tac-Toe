@@ -248,10 +248,6 @@ void updateSmallSectorBoard(char** smallSectorBoard, int sector, char updateChar
 
 //Runs the program, calls upon agents to give moves to the board
 int main(int argc, char** argv){
-	if (argc != 1){
-		printf("Usage: uttt [-h]\n-h:\tHelp. (Display rules.)\n\n");
-		exit(0);
-	}
 	int option;
 	while ((option = getopt(argc, argv, "h")) != -1){
 		switch(option){
@@ -259,8 +255,13 @@ int main(int argc, char** argv){
 				printf("Rules:\n");
 				printf("Conquer 3 sectors just like in normal tic-tac-toe to achieve victory.\n");
 				printf("Each sector is its own tic-tac-toe game.\n");
-				printf("Where you play in each sector corresponds to the next sector that your opponent has to play in,\n");
-				printf("if that sector is full or conquered, then your opponent may play anywhere.\n");
+				printf("Where you play in each sector corresponds to the next sector that your\n");
+				printf("opponent has to play in.\n");
+				printf("If that sector is full or conquered, then your opponent may play anywhere.\n");
+				printf("Enter row and col as numbers together. Ex: row 7, col 1 is \"71\", then enter.\n");
+				exit(0);
+			default:
+				printf("Usage: uttt [-h]\n-h:\tHelp. (Display rules.)\n");
 				exit(0);
 		}
 	}
