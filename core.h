@@ -25,6 +25,5 @@ void updateSmallSectorBoard(char** smallSectorBoard, int sector, char updateChar
 #define PLAYER1CHAR 'X'
 #define PLAYER2CHAR 'O'
 //#define DEBUG//optional
-#define SRAND//optional, seeds random number generator based on current time. disable for testing with same RNG sequence
 
 #endif

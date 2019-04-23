@@ -250,8 +250,9 @@ void updateSmallSectorBoard(char** smallSectorBoard, int sector, char updateChar
 int main(int argc, char** argv){
 	//variables to be possibly changed by command line flags, with default values
 	int sleepSeconds = 1;
+	int sRand = 0;//can set a specific random number seed [1, 2^32 - 1]. 0 means base on current time
 	int option;
-	while ((option = getopt(argc, argv, "hs:")) != -1){
+	while ((option = getopt(argc, argv, "hr:s:")) != -1){
 		switch(option){
 			case 'h':
 				printf("Rules:\n");
@@ -262,6 +263,9 @@ int main(int argc, char** argv){
 				printf("If that sector is full or conquered, then your opponent may play anywhere.\n");
 				printf("Enter row and col as numbers together. Ex: row 7, col 1 is \"71\", then enter.\n");
 				exit(0);
+			case 'r':
+				sRand = atoi(optarg);
+				break;
 			case 's':
 				sleepSeconds = atoi(optarg);
 				break;
@@ -270,11 +274,12 @@ int main(int argc, char** argv){
 				exit(0);
 		}
 	}
-#ifdef SRAND
-	//base random number generator on current time
-	time_t t;
-	srand(time(&t));
-#endif
+	if (sRand){//set that specific seed
+		srand(sRand);
+	}else{//use current time
+		time_t t;
+		srand(time(&t));
+	}
 	int i;
 	char** board = initBoard(9);
 	char** smallSectorBoard = initBoard(3);//for keeping track of won sectors, and therefore computing winner
