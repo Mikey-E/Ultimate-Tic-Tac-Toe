@@ -6,6 +6,10 @@ Run: ./uttt
 
 Advice: it's a good idea to right-click->properties and change the font and/or size of your windows command prompt so you aren't looking at a very tiny game board.
 
+Flags:
+-h	help
+-s	seconds of sleep between turns (default 1)
+
 RULES:
 Conquer 3 sectors just like in normal tic-tac-toe to achieve victory.
 Each sector is its own tic-tac-toe game.

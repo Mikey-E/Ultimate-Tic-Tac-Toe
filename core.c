@@ -248,8 +248,10 @@ void updateSmallSectorBoard(char** smallSectorBoard, int sector, char updateChar
 
 //Runs the program, calls upon agents to give moves to the board
 int main(int argc, char** argv){
+	//variables to be possibly changed by command line flags, with default values
+	int sleepSeconds = 1;
 	int option;
-	while ((option = getopt(argc, argv, "h")) != -1){
+	while ((option = getopt(argc, argv, "hs:")) != -1){
 		switch(option){
 			case 'h':
 				printf("Rules:\n");
@@ -260,6 +262,9 @@ int main(int argc, char** argv){
 				printf("If that sector is full or conquered, then your opponent may play anywhere.\n");
 				printf("Enter row and col as numbers together. Ex: row 7, col 1 is \"71\", then enter.\n");
 				exit(0);
+			case 's':
+				sleepSeconds = atoi(optarg);
+				break;
 			default:
 				printf("Usage: uttt [-h]\n-h:\tHelp. (Display rules.)\n");
 				exit(0);
@@ -313,7 +318,7 @@ int main(int argc, char** argv){
 			printf("For this move the row must be between %d and %d inclusive,\n", minRow, maxRow);
 			printf("and the col must be between %d and %d inclusive.\n", minCol, maxCol);
 		}else if (queryBoard(board, rowMove, colMove) != '\0'){
-			printf("That spot is already taken\n");
+			printf("That spot is already taken.\n");
 		}else{//acceptable move
 			currChar = (turn == 1 ? PLAYER1CHAR : PLAYER2CHAR);
 			setBoard(board, currChar, rowMove, colMove);
@@ -346,9 +351,7 @@ int main(int argc, char** argv){
 #endif
 			if (turn == 1) {turn = 2;} else {turn = 1;}
 		}
-#ifdef SLEEP
-		sleep(SLEEP);
-#endif
+		sleep(sleepSeconds);
 	}
 cleanUpMemory:
 	//clean-up memory

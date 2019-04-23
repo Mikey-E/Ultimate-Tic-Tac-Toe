@@ -1,9 +1,6 @@
 #include "core.h"
 
 void playHumanMove(char** board, int* dest, int minRow, int maxRow, int minCol, int maxCol, char myChar){
-#ifdef SLEEP
-	sleep(SLEEP);
-#endif
 	char row;
 	char col;
 	printf("Enter numbers for row & col: ");
