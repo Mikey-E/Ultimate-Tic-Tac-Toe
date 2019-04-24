@@ -341,7 +341,7 @@ int main(int argc, char** argv){
 				sleepSeconds = atoi(optarg);
 				break;
 			default:
-				printf("Usage: uttt [-h]\n-h:\tHelp. (Display rules.)\n");
+				printf("See readme.txt for info on flags.\n");
 				return(0);
 		}
 	}

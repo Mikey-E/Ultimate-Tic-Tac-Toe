@@ -10,6 +10,9 @@ Flags:
 -h	help
 -s	seconds of sleep between turns (default 1)
 -r	a specific random number seed [1, 4294967295]. 0 means base on current time
+-1	set first agent type (1,2,3). MCTS can be followed by a search depth (2-9), example: "-1 32" to make first agent MCTS with depth 2.
+-2	set second agent type.
+-f	set custom location and/or name of log file (fully qualified path or name in this local directory).
 
 RULES:
 Conquer 3 sectors just like in normal tic-tac-toe to achieve victory.
