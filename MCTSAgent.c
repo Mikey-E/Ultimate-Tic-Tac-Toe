@@ -187,7 +187,7 @@ void playMCTSMove(char** board, int* dest, int minRow, int maxRow, int minCol, i
 	int i;
 	node* root;
 	node* newRoot;
-	int* altDest = malloc(2 * sizeof(int));//test@@@ placeholder for call to compareboard.
+	int* altDest = malloc(2 * sizeof(int));
 	if (treeHashTable[myChar] == 0){//create root based on current state of the board
 		root = calloc(1, sizeof(node));
 		root->board = copyBoard(board, 9);
@@ -228,10 +228,6 @@ void playMCTSMove(char** board, int* dest, int minRow, int maxRow, int minCol, i
 			}
 		}
 		freeNode(root);
-
-		//test@@@
-		//newRoot->sims = 7;
-		//newRoot->parent = NULL;
 
 		root = newRoot;
 		root->parent = NULL;
