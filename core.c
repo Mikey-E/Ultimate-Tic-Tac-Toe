@@ -286,13 +286,27 @@ void updateSmallSectorBoard(char** smallSectorBoard, int sector, char updateChar
 	free(colIndex);
 }
 
+//writes agent info to file
+//opening and closing FILE* is responsibility of caller. FILE* should already be open
+void logAgentInfo(FILE* fp, char agentChar){
+	char typeStr[18];//adjust size as needed
+	if (agentTypeHashTable[agentChar] == 1){
+		sprintf(typeStr, "Human");
+	}else if (agentTypeHashTable[agentChar] == 2){
+		sprintf(typeStr, "Random Move Maker");
+	}else if (agentTypeHashTable[agentChar] == 3){
+		sprintf(typeStr, "MCTS (depth %d)", depthHashTable[agentChar]);
+	}
+	fprintf(fp, "Player %c: Type: %s\n", agentChar, typeStr);
+}
+
 //Runs the program, calls upon agents to give moves to the board
 int main(int argc, char** argv){
 	//variables to be possibly changed by command line flags, with default values
 	int sleepSeconds = 1;
 	time_t rngSeed = 0;//can set a specific random number seed [1, 2^32 - 1]. 0 means base on current time
 	time_t t;//used for file timestamps
-	char* outputFileStr = malloc(12 * sizeof(char));
+	char* outputFileStr = malloc(12 * sizeof(char));//enough space for history.txt
 	strcpy(outputFileStr, "history.txt");//where to append results of a game played
 	void (*agentFunction1)(char**, int*, int, int, int, int, char) = NULL;//called for moves
 	void (*agentFunction2)(char**, int*, int, int, int, int, char) = NULL;//"...
@@ -370,24 +384,17 @@ int main(int argc, char** argv){
 	//append some info for output file
 	//appending some information early (such as rng seed) can help with debugging in gdb if there is a game crash.
 	FILE* resultsFilePtr = fopen(outputFileStr, "a");//append mode
+	if (resultsFilePtr == NULL){
+		printf("Unable to open %s\n", outputFileStr);
+	}
 	fprintf(resultsFilePtr, "---Game---\n");
-	time(&t);//get time game started
-	char* startTimestamp = ctime(&t);	
+	time_t startTime;
+	time(&startTime);//get time game started
+	char* startTimestamp = ctime(&startTime);	
 	fprintf(resultsFilePtr, "Started: %s", startTimestamp);
 	fprintf(resultsFilePtr, "Random Number Seed: %d\n", rngSeed);
-	fprintf(resultsFilePtr,
-			"Player 1: %c, Type: %d",
-			PLAYER1CHAR, agentTypeHashTable[PLAYER1CHAR]);
-	if (agentTypeHashTable[PLAYER1CHAR] == 3){
-		fprintf(resultsFilePtr, ", Search Depth: %d", PLAYER1CHAR, depthHashTable[PLAYER1CHAR]);
-	}
-	fprintf(resultsFilePtr,
-			"\nPlayer 2: %c, Type: %d",
-			PLAYER2CHAR, agentTypeHashTable[PLAYER2CHAR]);
-	if (agentTypeHashTable[PLAYER2CHAR] == 3){
-		fprintf(resultsFilePtr, ", Search Depth: %d", PLAYER2CHAR, depthHashTable[PLAYER2CHAR]);
-	}
-	fprintf(resultsFilePtr, "\n");
+	logAgentInfo(resultsFilePtr, PLAYER1CHAR);
+	logAgentInfo(resultsFilePtr, PLAYER2CHAR);
 	fclose(resultsFilePtr);//write
 	resultsFilePtr = fopen(outputFileStr, "a");//reopen
 
@@ -426,7 +433,7 @@ int main(int argc, char** argv){
 			if (sumEmptySpaces(board) == 0){//draw
 				printBoard(board, -1, -1);
 				printf("Tie!\n");
-				fprintf(resultsFilePtr, "Winner: tie");
+				fprintf(resultsFilePtr, "Winner: tie\n");
 				goto cleanUpMemory;
 			}
 			updateBounds(rowMove, colMove, board, &minRow, &maxRow, &minCol, &maxCol, &isFullSector);
@@ -457,10 +464,12 @@ cleanUpMemory:
 	}
 	free(moves);
 
-	//append results to file
-	time(&t);//get time game finished
-	char* endTimestamp = ctime(&t);	
+	//append more results to file
+	time_t endTime;
+	time(&endTime);//get time game finished
+	char* endTimestamp = ctime(&endTime);	
 	fprintf(resultsFilePtr, "Ended: %s", endTimestamp);
+	fprintf(resultsFilePtr, "Game lasted: %0.0f seconds.\n", difftime(endTime, startTime));
 	fprintf(resultsFilePtr, "----------\n");
 
 	fclose(resultsFilePtr);
