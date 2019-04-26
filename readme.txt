@@ -13,6 +13,8 @@ Flags:
 -1	set first agent type (1,2,3). MCTS can be followed by a search depth (2-9), example: "-1 32" to make first agent MCTS with depth 2.
 -2	set second agent type.
 -f	set custom location and/or name of log file (fully qualified path or name in this local directory).
+-g	specify amount of games to play in a batch.
+-q	Quiet. Does not display the board. Makes large batches run faster.
 
 RULES:
 Conquer 3 sectors just like in normal tic-tac-toe to achieve victory.

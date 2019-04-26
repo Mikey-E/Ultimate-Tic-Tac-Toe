@@ -6,6 +6,7 @@
 void freeNode(node* node){
 	freeBoard(node->board);
 	freeSmallSectorBoard(node->smallSectorBoard);
+	free(node->children);
 	free(node);
 }
 
@@ -264,10 +265,15 @@ void playMCTSMove(char** board, int* dest, int minRow, int maxRow, int minCol, i
 
 			bestRatio = currRatio;
 			indexOfBest = i;
-		}else{
+		}
+	}
+	//free branches that will not be used
+	for (i = 0; i < root->childCount; i++){
+		if (i != indexOfBest){
 			freeTree(root->children[i]);
 		}
-	}	
+	}
+
 	//set final move
 	dest[0] = root->children[indexOfBest]->recentRow;
 	dest[1] = root->children[indexOfBest]->recentCol;

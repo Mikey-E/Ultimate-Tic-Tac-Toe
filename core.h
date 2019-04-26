@@ -27,6 +27,7 @@ int agentTypeHashTable[256];//for storing information about what type each agent
 // -- SETTINGS --
 #define PLAYER1CHAR 'X'
 #define PLAYER2CHAR 'O'
+#define TIMESTAMP_SPACE 25
 //#define DEBUG//optional
 
 #endif
