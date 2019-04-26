@@ -2,9 +2,14 @@
 #define CORE_H
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
-#include <windows.h>//not needed for compiling on linux
+#include <string.h>
+
+#ifdef WINDOWS
+#include <windows.h>//causes trouble for compiling on linux
+#endif
 
 //function declarations
 char** initBoard(int size);

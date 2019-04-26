@@ -72,9 +72,9 @@ void printBoard(char** board, int maxRow, int maxCol){
 	for (i = 0; i < 9; i++){
 		if ((i % 3) == 0){
 			if (i == 0){
-				printf(normalLine);
+				printf("%s", normalLine);
 			}else{
-				printf(i == maxRow ? midLineWithHats : midLine);
+				printf("%s", i == maxRow ? midLineWithHats : midLine);
 			}
 		} else {
 			printf("\n");
@@ -82,11 +82,17 @@ void printBoard(char** board, int maxRow, int maxCol){
 		printf("%d", i+1);
 		for (j = 0; j < 9; j++){
 			if ((j % 3) == 0){printf("|");}
+#ifdef WINDOWS
 			printf(" %c ", board[i][j]);
+#endif
+#ifdef LINUX
+			//linux won't print out \0 as a space by default
+			printf(" %c ", board[i][j] == '\0' ? ' ' : board[i][j]);
+#endif
 			if ((j + 1) == 9){printf("|");}
 		}
 	}
-	printf(maxRow == 9 ? midLineWithHats : midLine);
+	printf("%s", maxRow == 9 ? midLineWithHats : midLine);
 }
 
 void setBoard(char** board, char c, int row, int col){
@@ -421,7 +427,7 @@ int main(int argc, char** argv){
 		}
 		srand(rngSeed);
 		//appending some information early (such as rng seed) can help with debugging in gdb if there is a game crash.
-		fprintf(resultsFilePtr, "Random Number Seed: %d\n", rngSeed);
+		fprintf(resultsFilePtr, "Random Number Seed: %ld\n", rngSeed);
 		rngSeed++;//increment for potential next game
 
 		//append some info for output file

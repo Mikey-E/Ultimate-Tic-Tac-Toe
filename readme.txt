@@ -1,8 +1,9 @@
-On windows the game may be compiled by running "cg" in this directory. It can be started by running "uttt".
+On windows the game can be started by running "uttt_windows.exe".
+On linux it can be started by running "uttt_linux".
 
-On linux you may have to comment out "#include <windows.h>" (insert "//" before it in the same line) in core.h before compiling.
-Compile with the first line in cg.bat
-Run: ./uttt
+For those who want to compile from source code:
+On windows the game may be compiled by running "cwindows.bat" in this directory.
+On linux the game may be compiled by running "clinux.sh" in this directory.
 
 Advice: it's a good idea to right-click->properties and change the font and/or size of your windows command prompt so you aren't looking at a very tiny game board.
 
