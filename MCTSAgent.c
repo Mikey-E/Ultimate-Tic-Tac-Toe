@@ -23,11 +23,6 @@ void freeTree(node* root){
 //like strcmp but for uttt boards.
 //will update pointers to index of last compared different spot
 int compareBoard(char** board1, char** board2, int* diffRowIndex, int* diffColIndex){
-/*
-	printf("boards:\n");//@@@debug
-	printBoard(board1, -1, -1);//@@@debug
-	printBoard(board2, -1, -1);//@@@debug
-*/
 	int differences = 0;
 	int i; int j;
 	for (i = 0; i < 9; i++){
@@ -36,13 +31,9 @@ int compareBoard(char** board1, char** board2, int* diffRowIndex, int* diffColIn
 				differences++;
 				*diffRowIndex = i;
 				*diffColIndex = j;
-
-				//debug@@@
-				//printf("setting dri to %d, dci to %d\n", i, j);
 			}
 		}
 	}
-	//printf("differences: %d\n", differences);//@@@debug
 	return differences;
 }
 
@@ -102,13 +93,11 @@ void getSuccessors(node* root){
 void updateTree(node* root, int maxDepth){
 	int i;
 	if (root->childCount > 0){//if it already has children, move down the tree
-		//printf("at root->childCount > 0\n");//debug@@@
 		for (i = 0; i < root->childCount; i++){
 			updateTree(root->children[i], maxDepth - 1);
 		}
 	}else{
 		if (maxDepth <= 0){//if at depth limit, play random simulation & backpropagate data up tree
-			//printf("at maxdepth <= 0\n");//debug@@@
 			char result = playRandomSimulation(root);
 			do{
 				if (result == root->myChar){//win
@@ -121,11 +110,9 @@ void updateTree(node* root, int maxDepth){
 					root->sims++;
 				}
 				root = root->parent;
-				//printf("root: %p\n", root);//debug@@@
 			}while (root != NULL);
 
 		}else{//create new nodes
-			//printf("getting successors\n");//debug@@@
 			getSuccessors(root);
 			for (i = 0; i < root->childCount; i++){
 				updateTree(root->children[i], maxDepth - 1);
@@ -135,7 +122,6 @@ void updateTree(node* root, int maxDepth){
 }
 
 char playRandomSimulation(node* root){
-	//printf("calling new simulation\n");//debug@@@
 	int* moves = calloc(2, sizeof(int));
 	int turn = root->myChar == PLAYER1CHAR ? 1 : 2;
 	char** board = copyBoard(root->board, 9);
@@ -149,10 +135,6 @@ char playRandomSimulation(node* root){
 	char currChar;
 	char potentialWinner = '\0';//for checking if overall game has been won each round
 	while (1){
-/*
-		printf("new turn\n");//debug@@@
-		printf("%d, %d, %d, %d\n", minRow, maxRow, minCol, maxCol);//debug@@@
-*/
 		if (sumEmptySpaces(board) == 0){//draw
 			//potentialWinner = '\0';//represents draw, this statement likely not needed anymore.
 			break;
@@ -161,7 +143,6 @@ char playRandomSimulation(node* root){
 					playRandomMove(board, moves, minRow, maxRow, minCol, maxCol, PLAYER2CHAR);
 		currChar = (turn == 1 ? PLAYER1CHAR : PLAYER2CHAR);
 		setBoard(board, currChar, moves[0], moves[1]);
-		//printBoard(board, -1, -1);//debug@@@
 		changedSector = updateBoardStatus(board);
 		if (changedSector){
 			updateSmallSectorBoard(smallSectorBoard, changedSector, currChar);
@@ -176,7 +157,6 @@ char playRandomSimulation(node* root){
 	freeBoard(board);
 	freeSmallSectorBoard(smallSectorBoard);
 	free(moves);
-	//printf("done with simulation\n");//debug@@@
 	return potentialWinner;
 }
 
@@ -212,34 +192,14 @@ void playMCTSMove(char** board, int* dest, int minRow, int maxRow, int minCol, i
 				(root->children[i]->maxRow == maxRow)	&&
 				(root->children[i]->minCol == minCol)	&&
 				(root->children[i]->maxCol == maxCol)){
-				//debug@@@
-/*
-				printf("actual:\n");
-				printBoard(board, -1, -1);
-				printf("one of our children that might match up:\n");
-				printBoard(root->children[i]->board, -1, -1);
-				printf("values in that child:\n");
-				printf("minRow: %d, maxRow: %d\n", root->children[i]->minRow, root->children[i]->maxRow);
-				printf("minCol: %d, maxCol: %d\n", root->children[i]->minCol, root->children[i]->maxCol);
-*/
-
 				newRoot = root->children[i];
 			}else{
 				freeTree(root->children[i]);
 			}
 		}
 		freeNode(root);
-
 		root = newRoot;
 		root->parent = NULL;
-		
-		//debug@@@
-/*
-		printf("our new updated root board\n");
-		printBoard(root->board, -1, -1);
-		printf("minRow: %d, maxRow: %d\n", root->minRow, root->maxRow);
-		printf("minCol: %d, maxCol: %d\n", root->minCol, root->maxCol);
-*/
 	}
 	//update tree for choosing a good move
 	updateTree(root, searchDepth);
@@ -248,21 +208,8 @@ void playMCTSMove(char** board, int* dest, int minRow, int maxRow, int minCol, i
 	float bestRatio = 1;
 	float currRatio;
 	for (i = 0; i < root->childCount; i++){
-		//debug@@@
-/*
-		printf("potential move:\n");
-		printBoard(root->children[i]->board, -1, -1);
-		printf("and it's values:\n");
-		printf("minRow: %d, maxRow: %d\n", root->minRow, root->maxRow);
-		printf("minCol: %d, maxCol: %d\n", root->minCol, root->maxCol);
-*/
-
 		currRatio = root->children[i]->sims != 0 ? (root->children[i]->wins)/(root->children[i]->sims) : 0.5;//considered neither good nor bad
 		if (currRatio < bestRatio){
-			//debug@@@
-			//printf("choosing:\n");
-			//printBoard(root->children[i]->board, -1, -1);
-
 			bestRatio = currRatio;
 			indexOfBest = i;
 		}
@@ -273,11 +220,9 @@ void playMCTSMove(char** board, int* dest, int minRow, int maxRow, int minCol, i
 			freeTree(root->children[i]);
 		}
 	}
-
 	//set final move
 	dest[0] = root->children[indexOfBest]->recentRow;
 	dest[1] = root->children[indexOfBest]->recentCol;
-	//printf("Player %c trying to make move %d%d\n", myChar, dest[0], dest[1]);//@@@debug
 	//store root in hashtable for accessing again later
 	newRoot = root->children[indexOfBest];
 	freeNode(root);
