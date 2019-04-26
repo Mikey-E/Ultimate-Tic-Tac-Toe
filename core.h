@@ -26,6 +26,7 @@ int sumEmptySpaces(char** board);
 void setMoveFunction(void (**fPtrPtr)(char**, int*, int, int, int, int, char), char agentChar, int moveType, int depth);
 void updateBounds(int rowMove, int colMove, char** board, int* minRow, int* maxRow, int* minCol, int* maxCol, int* isFullSector);
 void updateSmallSectorBoard(char** smallSectorBoard, int sector, char updateChar);
+void logAgentInfo(FILE* fp, char agentChar);
 
 int agentTypeHashTable[256];//for storing information about what type each agent is
 
