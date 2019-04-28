@@ -197,16 +197,16 @@ int sumEmptySpaces(char** board){
 }
 
 //sets the move function for an agent
-//moveType == 0 means no move type yet, get user input.
+//agentType == 0 means no move type yet, get user input.
 //depth is for MCTS agents (3) only.
-void setMoveFunction(void (**fPtrPtr)(char**, int*, int, int, int, int, char), char agentChar, int moveType, int depth){
-	if (moveType){//already given move type
-		agentTypeHashTable[agentChar] = moveType;
-		if (moveType == 1){
+void setMoveFunction(void (**fPtrPtr)(char**, int*, int, int, int, int, char), char agentChar, int agentType, int depth){
+	if (agentType){//already given move type
+		agentTypeHashTable[agentChar] = agentType;
+		if (agentType == 1){
 			*fPtrPtr = &playHumanMove;
-		}else if (moveType == 2){
+		}else if (agentType == 2){
 			*fPtrPtr = &playRandomMove;
-		}else if (moveType == 3){
+		}else if (agentType == 3){
 			*fPtrPtr = &playMCTSMove;
 			if (depth < 2){//should never happen, but just in case
 				depth = 2;
@@ -217,19 +217,19 @@ void setMoveFunction(void (**fPtrPtr)(char**, int*, int, int, int, int, char), c
 			depthHashTable[agentChar] = (int) depth;//each MCTS agent's move function will retrieve its depth
 		}
 	}else{//get user input
-		char agentType;
+		char moveType;
 		do{
-			agentType = fgetc(stdin);
-			agentType = agentType - 48;//compensates for ascii
-			fflush(stdin);
-		}while ((agentType < 1) || (agentType > 3));//update if more agents are added in the future
-			printf("Setting agent type as %d.\n", agentType);
-			agentTypeHashTable[agentChar] = (int) agentType;
-		if (agentType == 1){
+			moveType = fgetc(stdin);
+			moveType = moveType - 48;//compensates for ascii
+		}while ((moveType < 1) || (moveType > 3));//update if more agents are added in the future
+		while (fgetc(stdin) != '\n'){}//advance to end of stdin
+		printf("Setting agent type as %d.\n", moveType);
+		agentTypeHashTable[agentChar] = (int) moveType;
+		if (moveType == 1){
 			*fPtrPtr = &playHumanMove;
-		}else if (agentType == 2){
+		}else if (moveType == 2){
 			*fPtrPtr = &playRandomMove;
-		}else if (agentType == 3){
+		}else if (moveType == 3){
 			*fPtrPtr = &playMCTSMove;
 			char searchDepth;
 			printf("What search depth should this MCTS agent have (2 to 9)?\n");
@@ -242,8 +242,8 @@ void setMoveFunction(void (**fPtrPtr)(char**, int*, int, int, int, int, char), c
 			do{
 				searchDepth = fgetc(stdin);
 				searchDepth = searchDepth - 48;//compensates for ascii
-				fflush(stdin);
 			}while ((searchDepth < 2) || (searchDepth > 9));
+			while (fgetc(stdin) != '\n'){}//advance to end of stdin
 			//ALWAYS keep depth as at least 2.
 			//0 wouldn't make any sense, and also probably cause seg fault
 			//1 leaves tree with nothing to compare with after opponent's move, also seg fault.
