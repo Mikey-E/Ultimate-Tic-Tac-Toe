@@ -39,6 +39,9 @@ int compareBoard(char** board1, char** board2, int* diffRowIndex, int* diffColIn
 
 //generates children for a node. Should only be used on child-less nodes.
 void getSuccessors(node* root){
+	if (root->childCount){
+		return;
+	}
 	//generate a child for every empty space within the bounds
 	int i; int j;
 	int* newMinRow = malloc(sizeof(int));
@@ -50,8 +53,9 @@ void getSuccessors(node* root){
 	int* changedSectorColIndex = malloc(sizeof(int));
 	int changedSector = 0;
 	node* newChild;
-	//calcuate space needed (worst case) for how many children there will be
-	root->children = calloc(((root->maxRow - (root->minRow - 1))*(root->maxCol - (root->minCol - 1))), sizeof(node*));
+	if (root->children == NULL){//calcuate space needed (worst case) for how many children there will be
+		root->children = calloc(((root->maxRow - (root->minRow - 1))*(root->maxCol - (root->minCol - 1))), sizeof(node*));
+	}
 	for (i = root->minRow; i <= root->maxRow; i++){
 		for (j = root->minCol; j <= root->maxCol; j++){
 			if (queryBoard(root->board, i, j) == '\0'){//then this is a potential move, so create a child node
@@ -167,7 +171,7 @@ void playMCTSMove(char** board, int* dest, int minRow, int maxRow, int minCol, i
 	}
 	int i;
 	node* root;
-	node* newRoot;
+	node* newRoot = NULL;
 	int* altDest = malloc(2 * sizeof(int));
 	if (treeHashTable[myChar] == 0){//create root based on current state of the board
 		root = calloc(1, sizeof(node));
@@ -191,7 +195,8 @@ void playMCTSMove(char** board, int* dest, int minRow, int maxRow, int minCol, i
 				(root->children[i]->minRow == minRow)	&&
 				(root->children[i]->maxRow == maxRow)	&&
 				(root->children[i]->minCol == minCol)	&&
-				(root->children[i]->maxCol == maxCol)){
+				(root->children[i]->maxCol == maxCol)	&&
+				(newRoot == NULL)){
 				newRoot = root->children[i];
 			}else{
 				freeTree(root->children[i]);
