@@ -82,13 +82,7 @@ void printBoard(char** board, int maxRow, int maxCol){
 		printf("%d", i+1);
 		for (j = 0; j < 9; j++){
 			if ((j % 3) == 0){printf("|");}
-#ifdef WINDOWS
-			printf(" %c ", board[i][j]);
-#endif
-#ifdef LINUX
-			//linux won't print out \0 as a space by default
 			printf(" %c ", board[i][j] == '\0' ? ' ' : board[i][j]);
-#endif
 			if ((j + 1) == 9){printf("|");}
 		}
 	}
