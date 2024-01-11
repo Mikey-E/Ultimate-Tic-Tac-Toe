@@ -28,7 +28,10 @@ void updateBounds(int rowMove, int colMove, char** board, int* minRow, int* maxR
 void updateSmallSectorBoard(char** smallSectorBoard, int sector, char updateChar);
 void logAgentInfo(FILE* fp, char agentChar);
 
+#ifdef WINDOWS
+//Causes linking errors on Linux to have this in the header file
 int agentTypeHashTable[256];//for storing information about what type each agent is
+#endif
 
 // -- SETTINGS --
 #define PLAYER1CHAR 'X'

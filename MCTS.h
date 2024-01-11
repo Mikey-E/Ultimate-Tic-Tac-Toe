@@ -33,7 +33,10 @@ struct Node {
 	int recentCol;
 };
 
+#ifdef WINDOWS
+//Causes linking errors on Linux to have this in the header file
 node* treeHashTable[256];//myChar will hash into this to give the root node pointer for that player.
 int depthHashTable[256];//myChar will hash into this and give the search depth for that MCTS agent.
+#endif
 
 #endif

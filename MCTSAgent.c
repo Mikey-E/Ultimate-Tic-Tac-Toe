@@ -2,6 +2,13 @@
 #include "MCTS.h"
 #include "moves.h"
 
+#ifdef LINUX
+//As opposed to having these in the header file, causes linking errors on Linux
+//extern these elsewhere
+node* treeHashTable[256];
+int depthHashTable[256];
+#endif
+
 //frees all dynamically allocated memory associated with a node
 void freeNode(node* node){
 	freeBoard(node->board);

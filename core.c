@@ -8,6 +8,15 @@
 
 //A sector is 1-9 inclusive (left->right, top->down)
 
+#ifdef LINUX
+//As opposed to having this in the header file, causes linking errors on Linux
+int agentTypeHashTable[256];
+
+//Also must reference these as extern
+extern node* treeHashTable[256];
+extern int depthHashTable[256];
+#endif
+
 //initializes a board and returns the pointer to it
 char** initBoard(int size){
 	char** board;
