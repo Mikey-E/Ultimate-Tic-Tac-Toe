@@ -18,7 +18,7 @@ On linux it can be started by running "./uttt_linux".
 ### For those who want to compile from source code:
 On windows the game may be compiled by running "cwindows.bat" in this directory.
 
-On linux the game may be compiled by running "clinux.sh" in this directory.
+On linux the game may be compiled by running "./clinux.sh" in this directory.
 
 ### Advice:
 It's a good idea to right-click->properties and change the font and/or size of your windows command prompt so you aren't looking at a very tiny game board.
